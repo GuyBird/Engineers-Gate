@@ -55,8 +55,8 @@ s = Scale(master, tickinterval=25, orient=HORIZONTAL)
 s.grid(row=5,column=0,sticky=N+W)
 
 
-listbox = Listbox(master)
-listbox.grid(row=2,colomn=1,sticky=W)
+listbox = Listbox(bigFrame)
+listbox.grid(row=2, column=1, sticky=W)
 
 b = Button(master, text='Add', command=lambda: listbox.insert(END, variable.get()))
 b.grid(row=0,column=1,sticky=N)
