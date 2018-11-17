@@ -59,8 +59,15 @@ def add_button():
     listbox.insert(END, variable.get())
 
 
+def remove_button():
+    if listbox.curselection():
+        listbox.delete(listbox.curselection())
+
+
 b = Button(bigFrame, text='Add', command=lambda: add_button())
 b.grid(row=3, column=0, sticky=N)
+b1 = Button(bigFrame, text='Remove', command=lambda: remove_button())
+b1.grid(row=3, column=1, sticky=N)
 w = OptionMenu(bigFrame, variable, *names)
 
 w.grid(row=2, column=0, sticky=N)
