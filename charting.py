@@ -12,6 +12,7 @@ instrumentID = 2
 timeframe = 500
 instrementData = backend.getMarketData(instrumentID, timeframe)
 
+global f;
 f = Figure(figsize=(5, 4), dpi=100)
 bigFrame = Frame()
 bigFrame.grid()
@@ -53,7 +54,12 @@ s.grid(row=5, column=0, sticky=N+W)
 listbox = Listbox(bigFrame)
 listbox.grid(row=4, column=0, sticky=W+S)
 
-b = Button(bigFrame, text='Add', command=lambda: listbox.insert(END, variable.get()))
+
+def add_button():
+    listbox.insert(END, variable.get())
+
+
+b = Button(bigFrame, text='Add', command=lambda: add_button())
 b.grid(row=3, column=0, sticky=N)
 w = OptionMenu(bigFrame, variable, *names)
 
@@ -61,3 +67,5 @@ w.grid(row=2, column=0, sticky=N)
 dataPlot.get_tk_widget().grid(row=0, column=4, sticky=S+E+N)
 
 master.mainloop()
+
+
