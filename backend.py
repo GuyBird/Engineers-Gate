@@ -34,8 +34,8 @@ def getMarketData(instrumentID, historical):
 def simpleMovingAverage(marketData, window):
     data = marketData["data"]
     result = []
-    for i in range(1, len(data)):
-        result.append(np.average(data[0 if i-window < 0 else i-window : i]))
+    for i in range(0, len(data)):
+        result.append(np.average(data[0 if i-window < 0 else i-window : i+1]))
     return result
 
 def exponentialMovingAverage(marketData, window):
