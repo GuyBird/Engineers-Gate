@@ -22,7 +22,7 @@ for c in range(4):
     master.columnconfigure(c, weight=1)
 
 FrameLeft = Frame(bigFrame, bg="red")
-FrameLeft.grid(row = 0, column = 0, rowspan = 6, columnspan = 4, sticky = W+N+S)
+FrameLeft.grid(row=0, column=0, rowspan=6, columnspan=4, sticky=W+N+S)
 
 a = f.add_subplot(111)
 a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["data"]), instrementData["currentEpoch"] + 1)), instrementData["data"])
@@ -36,7 +36,6 @@ dataPlot.draw()
 
 e = Entry(master)
 
-# e.grid(row=0,column=0,sticky=N)
 variable = StringVar(master)
 
 
@@ -45,22 +44,20 @@ for i in range(1, 10):
     names.append(backend.getInstrumentById(i)["company_name"])
 
 names.sort()
-variable.set(names[0]) # default value
-
-
+variable.set(names[0])  # default value
 
 s = Scale(bigFrame, tickinterval=25, orient=HORIZONTAL)
-s.grid(row=5,column=0,sticky=N+W)
+s.grid(row=5, column=0, sticky=N+W)
 
 
 listbox = Listbox(bigFrame)
 listbox.grid(row=4, column=0, sticky=W+S)
 
 b = Button(bigFrame, text='Add', command=lambda: listbox.insert(END, variable.get()))
-b.grid(row=3,column=0,sticky=N)
+b.grid(row=3, column=0, sticky=N)
 w = OptionMenu(bigFrame, variable, *names)
 
-w.grid(row=2,column=0,sticky=N)
-dataPlot.get_tk_widget().grid(row=0,column=4,sticky=S+E+N)
+w.grid(row=2, column=0, sticky=N)
+dataPlot.get_tk_widget().grid(row=0, column=4, sticky=S+E+N)
 
 master.mainloop()
