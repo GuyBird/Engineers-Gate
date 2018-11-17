@@ -1,18 +1,16 @@
 import matplotlib
-
 import backend
-matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from tkinter import *
 
+matplotlib.use('TkAgg')
 master = Tk()
 master.title("Engineers Gate Hire Us")
 
 instrumentID = 2
 timeframe = 500
 instrementData = backend.getMarketData(instrumentID, timeframe)
-print(instrementData["name"])
 
 f = Figure(figsize=(5, 4), dpi=100)
 bigFrame = Frame()
@@ -37,10 +35,8 @@ dataPlot = FigureCanvasTkAgg(f, master=master)
 dataPlot.draw()
 
 e = Entry(master)
-e.grid(row=0,column=0,sticky=N)
-b = Button(master,text='Add')
-b.grid(row=0,column=1,sticky=N)
 
+e.grid(row=0,column=0,sticky=N)
 variable = StringVar(master)
 
 
@@ -54,9 +50,16 @@ variable.set(names[0]) # default value
 w = OptionMenu(master, variable, *names)
 w.grid(row=1,column=0,sticky=N)
 
+
 s = Scale(master, tickinterval=25, orient=HORIZONTAL)
 s.grid(row=5,column=0,sticky=N+W)
 
+
+listbox = Listbox(master)
+listbox.grid(row=2,colomn=1,sticky=W)
+
+b = Button(master, text='Add', command=lambda: listbox.insert(END, variable.get()))
+b.grid(row=0,column=1,sticky=N)
 dataPlot.get_tk_widget().grid(row=1,column=3,sticky=S+E+N)
 
 master.mainloop()
