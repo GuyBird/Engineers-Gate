@@ -1,6 +1,7 @@
 import requests
 import json
 import numpy as np
+import statsmodels.stats.weightstats as ws
 
 def getCurrentEpoch():
     response = requests.get("http://egchallenge.tech/epoch")
@@ -44,3 +45,24 @@ def exponentialMovingAverage(marketData, window):
     result = np.convolve(data, weights)[:len(data)]
     result[:window-1] = result[window-1]
     return list(result)
+
+def movingStdDev(marketData, window):
+    data = marketData["data"]
+    result = []
+    for i in range(0, len(data)):
+        result.append(np.std(data[0 if i - window < 0 else i - window: i + 1]))
+    return result
+
+def expMovingStdDev(marketData, window):
+    data = marketData["data"]
+    results = []
+    for j in range(len(data)):
+        weights = np.ones((j+1 if j-window < 0 else window+1))
+        for i in range(len(weights)):
+            weights[i] = np.exp(len(weights)-i)
+        d = ws.DescrStatsW(data[0 if j-window < 0 else j-window : j+1], weights=weights)
+        if (len(d.var.shape) != 0):
+            results.append(d.var[0])
+        else:
+            results.append(d.var)
+    return results
