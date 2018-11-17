@@ -26,4 +26,5 @@ def getMarketData(instrumentID, historical):
     instrument = getInstrumentById(instrumentID) #Relevant information about the instrument
     marketData["name"] = instrument["company_name"]
     marketData["data"] = [x["price"] for x in relevant]
+    marketData["currentEpoch"] = getCurrentEpoch()
     return marketData
