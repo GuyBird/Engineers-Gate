@@ -1,1 +1,2 @@
-testerino
+EG Challenge login token:  
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjk1fQ.uTo3oRV06Ean_YRhcns5myTZCLfrTJFxfvtl7ncZgt4
