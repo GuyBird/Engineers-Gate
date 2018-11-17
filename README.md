@@ -1,2 +1,2 @@
-EG Challenge login token:  
+EG Challenge Team Token:  
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjk1fQ.uTo3oRV06Ean_YRhcns5myTZCLfrTJFxfvtl7ncZgt4
