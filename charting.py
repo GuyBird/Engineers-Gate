@@ -15,6 +15,7 @@ instrementData = backend.getMarketData(instrumentID, timeframe)
 f = Figure(figsize=(5, 4), dpi=100)
 a = f.add_subplot(111)
 a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["data"]), instrementData["currentEpoch"] + 1)), instrementData["data"])
+#a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["data"]), instrementData["currentEpoch"] + 1)), instrementData["data"])
 
 a.set_title(instrementData["name"])
 a.set_xlabel("epoch")
@@ -25,7 +26,6 @@ dataPlot.draw()
 
 e = Entry(master)
 e.pack()
-
 variable = StringVar(master)
 
 names = []
