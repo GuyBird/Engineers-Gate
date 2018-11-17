@@ -1,5 +1,6 @@
 import requests
 import json
+import numpy as np
 
 def getCurrentEpoch():
     response = requests.get("http://egchallenge.tech/epoch")
@@ -28,3 +29,18 @@ def getMarketData(instrumentID, historical):
     marketData["data"] = [x["price"] for x in relevant]
     marketData["currentEpoch"] = getCurrentEpoch()
     return marketData
+
+def simpleMovingAverage(marketData, window):
+    data = marketData["data"]
+    result = []
+    for i in range(1, len(data)):
+        result.append(np.average(data[0 if i-window < 0 else i-window : i]))
+    return result
+
+def exponentialMovingAverage(marketData, window):
+    data = marketData["data"]
+    weights = np.exp(np.linspace(-1., 0., window-1))
+    weights /= weights.sum()
+    result = np.convolve(data, weights)[:len(data)]
+    result[:window-1] = result[window-1]
+    return list(result)
