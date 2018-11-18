@@ -3,6 +3,8 @@ import json
 import numpy as np
 import statsmodels.stats.weightstats as ws
 
+industryReturnsCache = {}
+
 def getCurrentEpoch():
     response = requests.get("http://egchallenge.tech/epoch")
     parsed = json.loads(response.content)
@@ -89,14 +91,36 @@ def getMarketDataForEpoch(epoch):
     parsed = json.loads(response.content)
     return parsed
 
-def calculateIndustryIndices(industry):
+previousEpoch = getCurrentEpoch()
+
+def calculateIndustryIndicesUpToEpoch(industry, epoch):
     result = [100]
-    for epoch in range(1, getCurrentEpoch()):
-        epochMarketData = getMarketDataForEpoch(epoch)
-        returns = [x["epoch_return"] for x in epochMarketData]
-        industryReturn = np.average(returns)
-        result.append(result[-1] * industryReturn)
+    #Get all instruments id's for a given industry
+    relevantInstrumentIds = [x["id"] for x in getAllInstrumentsInIndustry(industry)]
+    #If there is not a chaced version of the thing, build it
+    currentEpoch = getCurrentEpoch()
+    if (not industry in industryReturnsCache.keys()):
+        for epoch in range(1, epoch):
+            epochMarketData = getMarketDataForEpoch(epoch)
+            returns = [x["epoch_return"] for x in epochMarketData if x["instrument_id"] in relevantInstrumentIds]
+            industryReturn = np.average(returns)
+            result.append(result[-1] * (1. + industryReturn))
+        industryReturnsCache[industry] = result #Add the results to the cache
+    #Otherwise just append to the cached version
+    else:
+        result = industryReturnsCache[industry]
+        if (currentEpoch != previousEpoch):
+            #Loop through all epochs missed and cache their indices
+            for epoch in range(previousEpoch, currentEpoch):
+                epochMarketData = getMarketDataForEpoch(getCurrentEpoch())
+                returns = [x["epoch_return"] for x in epochMarketData if x["instrument_id"] in relevantInstrumentIds]
+                industryReturn = np.average(returns)
+                result.append(result[-1] * (1. + industryReturn))
+    globals()["previousEpoch"] = currentEpoch
     return result
+
+def calculateIndustryIndices(industry):
+    return calculateIndustryIndicesUpToEpoch(industry, getCurrentEpoch())
 
 def getInstrumentId(instrumentName):
     response = requests.get("http://egchallenge.tech/instruments")
