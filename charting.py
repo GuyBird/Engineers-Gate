@@ -56,7 +56,13 @@ listbox.grid(row=4, column=0, sticky=W+S)
 
 
 def add_button():
-    listbox.insert(END, variable.get())
+    isnt_repeat = True
+    elements = listbox.get(0, listbox.size())
+    for i in elements:
+        if(i == variable.get()):
+            isnt_repeat = False
+    if(isnt_repeat):
+        listbox.insert(END, variable.get())
 
 
 def remove_button():
