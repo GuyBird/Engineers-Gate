@@ -155,6 +155,17 @@ def select_button():
     add_button()
 
 
+def moving_avg_button():
+    if 'selected' in b211.state():
+        index = backend.getInstrumentId(variable.get())
+        market_data = backend.getMarketData(index, time_frame)
+        simple_moving_avg = backend.simpleMovingAverage(market_data, time_frame)
+        plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(simple_moving_avg), market_data["currentEpoch"] + 1)), simple_moving_avg))
+    else:
+        plot_graph[1].pop(0).remove()
+    dataPlot.draw()
+
+
 b = Button(bigFrame, text='Add', bg='#488cf9', foreground="#ffffff", command=lambda: add_button())
 b.grid(row=3, column=0, sticky=N)
 b1 = Button(bigFrame, text='Remove', bg='#488cf9', foreground="#ffffff", command=lambda: remove_button())
@@ -171,6 +182,8 @@ w2.grid(row=2, column=0, sticky=N)
 b21 = Button(bigFrame2, text='Select', bg='#488cf9', foreground="#ffffff", command=lambda: select_button())
 b21.grid(row=2, column=1, sticky=N)
 
+b211 = ttk.Checkbutton(bigFrame2, text='Moving Avg.', command=lambda: moving_avg_button())
+b211.grid(row=3, column=4, sticky=E)
 
 master.mainloop()
 

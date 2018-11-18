@@ -33,7 +33,7 @@ def getMarketData(instrumentID, historical):
     return marketData
 
 def simpleMovingAverage(marketData, window):
-    data = marketData["data"]
+    data = marketData["price"]
     result = []
     for i in range(0, len(data)):
         result.append(np.average(data[0 if i-window < 0 else i-window : i+1]))
