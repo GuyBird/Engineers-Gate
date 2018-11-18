@@ -67,3 +67,39 @@ def expMovingStdDev(marketData, window):
         else:
             results.append(d.var)
     return results
+
+def returnAutocorrelation(marketData, lag):
+    returns = marketData["return"]
+    return np.correlate(returns[:-lag], returns[lag:], 'valid')[0]
+
+def rangeReturnAutocorrelation(marketData, maxLag=1):
+    result = []
+    for lag in range(1, maxLag+1):
+        result.append(returnAutocorrelation(marketData, lag))
+    return result
+
+def getAllInstrumentsInIndustry(industry):
+    response = requests.get("http://egchallenge.tech/instruments")
+    parsed = json.loads(response.content)
+    result = [x for x in parsed if x["industry"] == industry]
+    return result
+
+def getMarketDataForEpoch(epoch):
+    response = requests.get("http://egchallenge.tech/marketdata/epoch/" + str(epoch))
+    parsed = json.loads(response.content)
+    return parsed
+
+def calculateIndustryIndices(industry):
+    result = [100]
+    for epoch in range(1, getCurrentEpoch()):
+        epochMarketData = getMarketDataForEpoch(epoch)
+        returns = [x["epoch_return"] for x in epochMarketData]
+        industryReturn = np.average(returns)
+        result.append(result[-1] * industryReturn)
+    return result
+
+def getInstrumentId(instrumentName):
+    response = requests.get("http://egchallenge.tech/instruments")
+    parsed = json.loads(response.content)
+    instrument = [x for x in parsed if x["company_name"] == instrumentName]
+    return instrument[0]["id"]
