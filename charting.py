@@ -12,7 +12,6 @@ instrumentID = 2
 timeframe = 500
 instrementData = backend.getMarketData(instrumentID, timeframe)
 
-global f
 f = Figure(figsize=(5, 4), dpi=100)
 bigFrame = Frame()
 bigFrame.grid()
@@ -26,9 +25,11 @@ FrameLeft = Frame(bigFrame)
 FrameLeft.grid(row=0, column=0, rowspan=6, columnspan=4, sticky=W+N+S)
 
 a = f.add_subplot(111)
-a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"])
+#plotgraph = a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"])
 
-a.set_title(instrementData["name"])
+plotgraph = []
+
+#a.set_title(instrementData["name"])
 a.set_xlabel("epoch")
 a.set_ylabel("price")
 
@@ -63,11 +64,31 @@ def add_button():
             isnt_repeat = False
     if(isnt_repeat):
         listbox.insert(END, variable.get())
+        instrumentID = backend.getInstrumentId(variable.get())
+        timeframe = 500
+        instrementData = backend.getMarketData(instrumentID, timeframe)
+        global plotgraph
+        plotgraph.append(a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"]))
+        a.set_title(instrementData["name"])
+        dataPlot.draw()
 
 
 def remove_button():
     if listbox.curselection():
+        index = listbox.curselection()[0]
         listbox.delete(listbox.curselection())
+        plotgraph[index].pop(0).remove()
+        move_array(index)
+        dataPlot.draw()
+        print(plotgraph)
+
+def move_array(index):
+    for i in range(index, len(plotgraph)):
+        print(i)
+        if i + 1 < len(plotgraph):
+            plotgraph[i] = plotgraph[i + 1]
+
+    del plotgraph[len(plotgraph) - 1]
 
 
 b = Button(bigFrame, text='Add', command=lambda: add_button())
