@@ -87,9 +87,9 @@ def move_array(index):
     del plotgraph[len(plotgraph) - 1]
 
 
-b = Button(bigFrame, text='Add', command=lambda: add_button())
+b = Button(bigFrame, text='Add', bg='#488cf9', foreground="#ffffff", command=lambda: add_button())
 b.grid(row=3, column=0, sticky=N)
-b1 = Button(bigFrame, text='Remove', command=lambda: remove_button())
+b1 = Button(bigFrame, text='Remove', bg='#488cf9', foreground="#ffffff", command=lambda: remove_button())
 b1.grid(row=3, column=1, sticky=N)
 w = OptionMenu(bigFrame, variable, *names)
 
