@@ -12,7 +12,7 @@ instrumentID = 2
 timeframe = 500
 instrementData = backend.getMarketData(instrumentID, timeframe)
 
-global f;
+global f
 f = Figure(figsize=(5, 4), dpi=100)
 bigFrame = Frame()
 bigFrame.grid()
@@ -22,7 +22,7 @@ for r in range(6):
 for c in range(4):
     master.columnconfigure(c, weight=1)
 
-FrameLeft = Frame(bigFrame, bg="red")
+FrameLeft = Frame(bigFrame)
 FrameLeft.grid(row=0, column=0, rowspan=6, columnspan=4, sticky=W+N+S)
 
 a = f.add_subplot(111)
