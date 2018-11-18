@@ -4,6 +4,10 @@ import numpy as np
 import statsmodels.stats.weightstats as ws
 import pandas as pd
 
+#Cache objects
+industryIndices = None
+prevEpoch = 0
+
 #Data acquisition/Helper methods
 
 def getCurrentEpoch():
@@ -92,19 +96,24 @@ def rangeAutocorrelation(marketData, maxLag=1):
     return result
 
 def industryIndex():
-    #TODO Speed this up massively
-    r = {}
     currentEpoch = getCurrentEpoch()
-    for i in range(currentEpoch):
-        r[i] = epochMarketData(i)["epoch_return"]
-    r = pd.DataFrame(r)
-    r["industry"] = getIndustries()
-    epochMean = r.groupby(by="industry").mean()
-    industryIndex = pd.DataFrame(epochMean.index).set_index("industry")
-    industryIndex[0] = 100
-    for c in epochMean.columns:
-        industryIndex[c] = (epochMean[c] + 1) * industryIndex[c-1]
-    return industryIndex
+    if (globals()["prevEpoch"] != currentEpoch):
+        r = {}
+        currentEpoch = getCurrentEpoch()
+        for i in range(currentEpoch):
+            r[i] = epochMarketData(i)["epoch_return"]
+        r = pd.DataFrame(r)
+        r["industry"] = getIndustries()
+        epochMean = r.groupby(by="industry").mean()
+        industryIndex = pd.DataFrame(epochMean.index).set_index("industry")
+        industryIndex[0] = 100
+        for c in epochMean.columns:
+            industryIndex[c] = (epochMean[c] + 1) * industryIndex[c-1]
+        globals()["industryIndices"] = industryIndex # put the thing into the cache
+        globals()["prevEpoch"] = currentEpoch
+        return industryIndex
+    else:
+        return industryIndices
 
 
 def rollingCorrelation(instruments, historical=0, window=10):
@@ -127,3 +136,4 @@ def expRollingCorrelation(instruments, historical=0, halflife=1):
     series1 = pd.Series(marketDatas[0]["return"])
     series2 = pd.Series(marketDatas[1]["return"])
     return list(series1.ewm(halflife).corr(series2))
+
