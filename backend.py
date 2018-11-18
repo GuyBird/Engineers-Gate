@@ -90,14 +90,23 @@ def rangeAutocorrelation(marketData, maxLag=1):
 def industryIndex(industry, endEpoch):
     pass
 
-def simpleRollingCorrelation(instruments, historical=0, window=10):
+def rollingCorrelation(instruments, historical=0, window=10):
+    #TODO Make this calculate the correlation between N instruments, not just 2
     marketDatas = []
     #Acquire market data for every instrument
     for instrument in instruments:
         marketDatas.append(getMarketData(getInstrumentId(instrument), historical))
     #Special (and easy) case
-    if (len(marketDatas) == 2):
-        series1 = pd.Series(marketDatas[0]["return"])
-        series2 = pd.Series(marketDatas[1]["return"])
-        return list(series1.rolling(window).corr(series2))
-    return [1] * historical #Dummy, until there is clarification of what the correlation of N lists is
+    series1 = pd.Series(marketDatas[0]["return"])
+    series2 = pd.Series(marketDatas[1]["return"])
+    return list(series1.rolling(window).corr(series2))
+
+def expRollingCorrelation(instruments, historical=0, halflife=1):
+    #TODO Make this calculate the correlation between N instruments, not just 2
+    marketDatas = []
+    #Acquire market data for every instrument supplied
+    for instrument in instruments:
+        marketDatas.append(getMarketData(getInstrumentId(instrument), historical))
+    series1 = pd.Series(marketDatas[0]["return"])
+    series2 = pd.Series(marketDatas[1]["return"])
+    return list(series1.ewm(halflife).corr(series2))
