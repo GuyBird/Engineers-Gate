@@ -65,7 +65,6 @@ def add_button():
         instrementData = backend.getMarketData(instrumentID, timeframe)
         global plotgraph
         plotgraph.append(a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"]))
-        a.set_title(instrementData["name"])
         dataPlot.draw()
         color = plotgraph[listbox.size() - 1][0].get_color()
         listbox.itemconfig(listbox.size() - 1, {'bg': color})
