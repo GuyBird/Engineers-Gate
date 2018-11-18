@@ -55,9 +55,9 @@ def add_button():
     isnt_repeat = True
     elements = listbox.get(0, listbox.size())
     for i in elements:
-        if(i == variable.get()):
+        if i == variable.get():
             isnt_repeat = False
-    if(isnt_repeat):
+    if isnt_repeat:
         listbox.insert(END, variable.get())
         instrumentID = backend.getInstrumentId(variable.get())
         global timeframe
@@ -78,6 +78,17 @@ def remove_button():
         listbox.delete(listbox.curselection())
         plotgraph[index].pop(0).remove()
         move_array(index)
+        maxvalue = 0
+        minvalue = 10000
+        for i in plotgraph:
+            if max(i[0].get_ydata()) > maxvalue:
+                maxvalue = max(i[0].get_ydata())
+            if min(i[0].get_ydata()) < minvalue:
+                minvalue = min(i[0].get_ydata())
+            if len(plotgraph) > 1:
+                a.set_ylim(minvalue - (minvalue * 0.05), maxvalue + (maxvalue * 0.05))
+            else:
+                a.set_ylim(minvalue, maxvalue)
         dataPlot.draw()
 
 def move_array(index):
@@ -101,7 +112,20 @@ def change_timeframe():
         color = plotgraph[count][0].get_color()
         plotgraph[count] = (a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"], color=color))
         count += 1
+    a.set_xlim(instrementData['currentEpoch'] - timeframe, instrementData['currentEpoch'])
+    maxvalue = 0
+    minvalue = 10000
+    for i in plotgraph:
+        if max(i[0].get_ydata()) > maxvalue:
+            maxvalue = max(i[0].get_ydata())
+        if min(i[0].get_ydata()) < minvalue:
+            minvalue = min(i[0].get_ydata())
+        if len(plotgraph) > 1:
+            a.set_ylim(minvalue - (minvalue * 0.05), maxvalue + (maxvalue * 0.05))
+        else:
+            a.set_ylim(minvalue, maxvalue)
     dataPlot.draw()
+
 
 b = Button(bigFrame, text='Add', bg='#488cf9', foreground="#ffffff", command=lambda: add_button())
 b.grid(row=3, column=0, sticky=N)
