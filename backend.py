@@ -2,6 +2,7 @@ import requests
 import json
 import numpy as np
 import statsmodels.stats.weightstats as ws
+import pandas as pd
 
 industryReturnsCache = {}
 
@@ -97,8 +98,8 @@ def calculateIndustryIndicesUpToEpoch(industry, epoch):
     result = [100]
     #Get all instruments id's for a given industry
     relevantInstrumentIds = [x["id"] for x in getAllInstrumentsInIndustry(industry)]
-    #If there is not a chaced version of the thing, build it
     currentEpoch = getCurrentEpoch()
+    #If there is not a chaced version of the thing, build it
     if (not industry in industryReturnsCache.keys()):
         for epoch in range(1, epoch):
             epochMarketData = getMarketDataForEpoch(epoch)
@@ -127,3 +128,15 @@ def getInstrumentId(instrumentName):
     parsed = json.loads(response.content)
     instrument = [x for x in parsed if x["company_name"] == instrumentName]
     return instrument[0]["id"]
+
+def simpleRollingCorrelation(instruments, historical=0, window=10):
+    marketDatas = []
+    #Acquire market data for every instrument
+    for instrument in instruments:
+        marketDatas.append(getMarketData(getInstrumentId(instrument), historical))
+    #Special (and easy) case
+    if (len(marketDatas) == 2):
+        series1 = pd.Series(marketDatas[0]["return"])
+        series2 = pd.Series(marketDatas[1]["return"])
+        return list(series1.rolling(window).corr(series2))
+    return [1] * historical #Dummy, until there is clarification of what the correlation of N lists is
