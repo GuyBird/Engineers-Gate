@@ -7,8 +7,14 @@ from tkinter import ttk
 
 matplotlib.use('TkAgg')
 master = Tk()
+
+style = ttk.Style()
+style.configure("BW.TLabel", background="white")
+
+
 master.title("Engineers Gate Hire Us")
-tabs = ttk.Notebook(master)
+tabs = ttk.Notebook(master, style="BW.TLabel")
+master.configure(background='white')
 
 tab1 = ttk.Frame(tabs)
 tab2 = ttk.Frame(tabs)
@@ -16,9 +22,9 @@ tab3 = ttk.Frame(tabs)
 
 
 f = Figure(figsize=(5, 4), dpi=100)
-bigFrame = Frame(tab1)
+bigFrame = Frame(tab1, bg='white')
 bigFrame.grid()
-bigFrame2 = Frame(tab2)
+bigFrame2 = Frame(tab2, bg='white')
 bigFrame2.grid()
 
 tabs.add(tab1, text="Prices", compound=TOP)
@@ -60,13 +66,13 @@ for i in range(1, 10):
 names.sort()
 variable.set(names[0])
 
-s = Scale(bigFrame, from_=10, to=1000, resolution=10, orient=HORIZONTAL)
+s = Scale(bigFrame, from_=10, to=1000, resolution=10, activebackground="#40913F", highlightcolor='#40913F', orient=HORIZONTAL, bg='white', bd=0, highlightbackground='white')
 s.set(500)
 s.grid(row=5, column=0, sticky=N)
 
 
-listbox = Listbox(bigFrame)
-listbox.grid(row=4, column=0, sticky=W+S)
+listbox = Listbox(bigFrame, width=50)
+listbox.grid(row=4, column=0, sticky=W+S, columnspan = 2)
 
 
 def add_button():
@@ -189,20 +195,23 @@ def autocorrelation_button():
     return 1
 
 
-b = Button(bigFrame, text='Add', bg='#488cf9', foreground="#ffffff", command=lambda: add_button())
+b = Button(bigFrame, text='Add', bg='#00a86b', foreground="#ffffff", command=lambda: add_button())
+
 b.grid(row=3, column=0, sticky=N)
-b1 = Button(bigFrame, text='Remove', bg='#488cf9', foreground="#ffffff", command=lambda: remove_button())
+b1 = Button(bigFrame, text='Remove', bg='#00a86b', foreground="#ffffff", command=lambda: remove_button())
 b1.grid(row=3, column=1, sticky=N)
-b2 = Button(bigFrame, text='Apply', bg='#488cf9', foreground="#ffffff", command=lambda: change_time_frame())
+b2 = Button(bigFrame, text='Apply', bg='#00a86b', foreground="#ffffff", command=lambda: change_time_frame())
 b2.grid(row=5, column=1, sticky=S)
 w = OptionMenu(bigFrame, variable, *names)
-w.grid(row=2, column=0, sticky=N)
+w.config(width=40)
+w.grid(row=2, column=0, sticky=N, columnspan=2)
 dataPlot.get_tk_widget().grid(row=0, column=4, sticky=S+E+N)
 
 w2 = OptionMenu(bigFrame2, variable, *names)
+w2.config(width=30)
 w2.grid(row=2, column=0, sticky=N)
 
-b21 = Button(bigFrame2, text='Select', bg='#488cf9', foreground="#ffffff", command=lambda: select_button())
+b21 = Button(bigFrame2, text='Select', bg='#00a86b', foreground="#ffffff", command=lambda: select_button())
 b21.grid(row=2, column=1, sticky=N)
 
 b211 = ttk.Checkbutton(bigFrame2, text='Simlpe Moving Avg.', command=lambda: moving_avg_button())
