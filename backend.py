@@ -48,16 +48,20 @@ def instrumentsInIndustry(industry):
 
 def epochMarketData(epoch):
     response = requests.get("http://egchallenge.tech/marketdata/epoch/" + str(epoch))
-    parsed = json.loads(response.content)
-    return parsed
+    return pd.DataFrame(response.json())
+
+def getIndustries():
+    response = requests.get("http://egchallenge.tech/instruments")
+    return pd.DataFrame(response.json())["industry"]
+
 
 #Charting indicators
 
 def movingAverage(marketData, window):
-    data = marketData["data"]
+    price = marketData["price"]
     result = []
-    for i in range(0, len(data)):
-        result.append(np.average(data[0 if i-window < 0 else i-window : i+1]))
+    for i in range(0, len(price)):
+        result.append(np.average(price[0 if i-window < 0 else i-window : i+1]))
     return result
 
 def expMovingAverage(marketData, halflife):
@@ -87,8 +91,21 @@ def rangeAutocorrelation(marketData, maxLag=1):
         result.append(autocorrelation(marketData, lag))
     return result
 
-def industryIndex(industry, endEpoch):
-    pass
+def industryIndex():
+    #TODO Speed this up massively
+    r = {}
+    currentEpoch = getCurrentEpoch()
+    for i in range(currentEpoch):
+        r[i] = epochMarketData(i)["epoch_return"]
+    r = pd.DataFrame(r)
+    r["industry"] = getIndustries()
+    epochMean = r.groupby(by="industry").mean()
+    industryIndex = pd.DataFrame(epochMean.index).set_index("industry")
+    industryIndex[0] = 100
+    for c in epochMean.columns:
+        industryIndex[c] = (epochMean[c] + 1) * industryIndex[c-1]
+    return industryIndex
+
 
 def rollingCorrelation(instruments, historical=0, window=10):
     #TODO Make this calculate the correlation between N instruments, not just 2
