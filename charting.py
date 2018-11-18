@@ -227,7 +227,7 @@ def add_selection_button():
 
 def moving_avg_button():
     if 'selected' in b211.state():
-        index = backend.getInstrumentId(variable.get())
+        index = backend.getInstrumentId(names1.get(names1.curselection()))
         market_data = backend.getMarketData(index, time_frame)
         simple_moving_avg = backend.movingAverage(market_data, time_frame)
         plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(simple_moving_avg), market_data["currentEpoch"] + 1)), simple_moving_avg))
@@ -238,7 +238,7 @@ def moving_avg_button():
 
 def expo_moving_avg_button():
     if 'selected' in b212.state():
-        index = backend.getInstrumentId(variable.get())
+        index = backend.getInstrumentId(names1.get(names1.curselection()))
         market_data = backend.getMarketData(index, time_frame)
         expo_moving_avg = backend.expMovingAverage(market_data, 1)
         plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
@@ -249,7 +249,7 @@ def expo_moving_avg_button():
 
 def moving_standard_deviation_button():
     if 'selected' in b221.state():
-        index = backend.getInstrumentId(variable.get())
+        index = backend.getInstrumentId(names1.get(names1.curselection()))
         market_data = backend.getMarketData(index, time_frame)
         expo_moving_avg = backend.movingStdDev(market_data, 1)
         print(expo_moving_avg)
@@ -262,7 +262,7 @@ def moving_standard_deviation_button():
 
 def expo_standard_deviation_button():
     if 'selected' in b222.state():
-        index = backend.getInstrumentId(variable.get())
+        index = backend.getInstrumentId(names1.get(names1.curselection()))
         market_data = backend.getMarketData(index, time_frame)
         expo_moving_avg = backend.expMovingStdDev(market_data, 1)
         plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
@@ -275,7 +275,7 @@ def expo_standard_deviation_button():
 
 def autocorrelation_button():
     if 'selected' in b231.state():
-        index = backend.getInstrumentId(variable.get())
+        index = backend.getInstrumentId(names1.get(names1.curselection()))
         market_data = backend.getMarketData(index, time_frame)
         expo_moving_avg = backend.rangeAutocorrelation(market_data, 10)
         print(expo_moving_avg)
@@ -299,7 +299,7 @@ def chart_industry_indexes():
 
 def rolling_correlation_pair_button():
     if 'selected' in b241.state():
-        index = backend.getInstrumentId(variable.get())
+        index = backend.getInstrumentId(names1.get(names1.curselection()))
         market_data = backend.getMarketData(index, time_frame)
         expo_moving_avg = backend.rollingCorrelation(["Blank River", "Dew Iceberg"], time_frame)
         plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
@@ -310,7 +310,7 @@ def rolling_correlation_pair_button():
 
 def expo_correlation_pair_button():
     if 'selected' in b242.state():
-        index = backend.getInstrumentId(variable.get())
+        index = backend.getInstrumentId(names1.get(names1.curselection()))
         market_data = backend.getMarketData(index, time_frame)
         expo_moving_avg = backend.expRollingCorrelation(["Blank River", "Dew Iceberg"], time_frame)
         plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
