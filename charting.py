@@ -26,7 +26,7 @@ FrameLeft = Frame(bigFrame, bg="red")
 FrameLeft.grid(row=0, column=0, rowspan=6, columnspan=4, sticky=W+N+S)
 
 a = f.add_subplot(111)
-a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["data"]), instrementData["currentEpoch"] + 1)), instrementData["data"])
+a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"])
 
 a.set_title(instrementData["name"])
 a.set_xlabel("epoch")
