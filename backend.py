@@ -4,7 +4,7 @@ import numpy as np
 import statsmodels.stats.weightstats as ws
 import pandas as pd
 
-industryReturnsCache = {}
+#Data acquisition/Helper methods
 
 def getCurrentEpoch():
     response = requests.get("http://egchallenge.tech/epoch")
@@ -17,6 +17,11 @@ def getInstrumentById(instrumentID):
     instrument = [x for x in parsed if x["id"] == instrumentID]
     return instrument[0]
 
+def getInstrumentId(instrumentName):
+    response = requests.get("http://egchallenge.tech/instruments")
+    parsed = json.loads(response.content)
+    instrument = [x for x in parsed if x["company_name"] == instrumentName]
+    return instrument[0]["id"]
 
 def getMarketData(instrumentID, historical):
     response = requests.get("http://egchallenge.tech/marketdata/instrument/" + str(instrumentID))
@@ -35,99 +40,55 @@ def getMarketData(instrumentID, historical):
     marketData["currentEpoch"] = getCurrentEpoch()
     return marketData
 
-def simpleMovingAverage(marketData, window):
+def instrumentsInIndustry(industry):
+    response = requests.get("http://egchallenge.tech/instruments")
+    parsed = json.loads(response.content)
+    result = [x for x in parsed if x["industry"] == industry]
+    return result
+
+def epochMarketData(epoch):
+    response = requests.get("http://egchallenge.tech/marketdata/epoch/" + str(epoch))
+    parsed = json.loads(response.content)
+    return parsed
+
+#Charting indicators
+
+def movingAverage(marketData, window):
     data = marketData["data"]
     result = []
     for i in range(0, len(data)):
         result.append(np.average(data[0 if i-window < 0 else i-window : i+1]))
     return result
 
-def exponentialMovingAverage(marketData, window):
-    data = marketData["data"]
-    weights = np.exp(np.linspace(-1., 0., window-1))
-    weights /= weights.sum()
-    result = np.convolve(data, weights)[:len(data)]
-    result[:window-1] = result[window-1]
-    return list(result)
+def expMovingAverage(marketData, halflife):
+    price = marketData["price"]
+    print(price)
+    df = pd.DataFrame({'price' : price})
+    return list(df.ewm(halflife=halflife).mean()["price"])
 
 def movingStdDev(marketData, window):
-    data = marketData["data"]
-    result = []
-    for i in range(0, len(data)):
-        result.append(np.std(data[0 if i - window < 0 else i - window: i + 1]))
-    return result
+    price = marketData["price"]
+    df = pd.DataFrame({'price' : price})
+    return list(df.rolling(window).std()["price"])
 
-def expMovingStdDev(marketData, window):
-    data = marketData["data"]
-    results = []
-    for j in range(len(data)):
-        weights = np.ones((j+1 if j-window < 0 else window+1))
-        for i in range(len(weights)):
-            weights[i] = np.exp(len(weights)-i)
-        d = ws.DescrStatsW(data[0 if j-window < 0 else j-window : j+1], weights=weights)
-        if (len(d.var.shape) != 0):
-            results.append(d.var[0])
-        else:
-            results.append(d.var)
-    return results
+def expMovingStdDev(marketData, halfLife):
+    price = marketData["price"]
+    df = pd.DataFrame({'price' : price})
+    return list(df.ewm(halfLife).std()['price'])
 
-def returnAutocorrelation(marketData, lag):
+def autocorrelation(marketData, lag=1):
     returns = marketData["return"]
-    return np.correlate(returns[:-lag], returns[lag:], 'valid')[0]
+    s = pd.Series(returns)
+    return s.autocorr(lag)
 
-def rangeReturnAutocorrelation(marketData, maxLag=1):
+def rangeAutocorrelation(marketData, maxLag=1):
     result = []
     for lag in range(1, maxLag+1):
-        result.append(returnAutocorrelation(marketData, lag))
+        result.append(autocorrelation(marketData, lag))
     return result
 
-def getAllInstrumentsInIndustry(industry):
-    response = requests.get("http://egchallenge.tech/instruments")
-    parsed = json.loads(response.content)
-    result = [x for x in parsed if x["industry"] == industry]
-    return result
-
-def getMarketDataForEpoch(epoch):
-    response = requests.get("http://egchallenge.tech/marketdata/epoch/" + str(epoch))
-    parsed = json.loads(response.content)
-    return parsed
-
-previousEpoch = getCurrentEpoch()
-
-def calculateIndustryIndicesUpToEpoch(industry, epoch):
-    result = [100]
-    #Get all instruments id's for a given industry
-    relevantInstrumentIds = [x["id"] for x in getAllInstrumentsInIndustry(industry)]
-    currentEpoch = getCurrentEpoch()
-    #If there is not a chaced version of the thing, build it
-    if (not industry in industryReturnsCache.keys()):
-        for epoch in range(1, epoch):
-            epochMarketData = getMarketDataForEpoch(epoch)
-            returns = [x["epoch_return"] for x in epochMarketData if x["instrument_id"] in relevantInstrumentIds]
-            industryReturn = np.average(returns)
-            result.append(result[-1] * (1. + industryReturn))
-        industryReturnsCache[industry] = result #Add the results to the cache
-    #Otherwise just append to the cached version
-    else:
-        result = industryReturnsCache[industry]
-        if (currentEpoch != previousEpoch):
-            #Loop through all epochs missed and cache their indices
-            for epoch in range(previousEpoch, currentEpoch):
-                epochMarketData = getMarketDataForEpoch(getCurrentEpoch())
-                returns = [x["epoch_return"] for x in epochMarketData if x["instrument_id"] in relevantInstrumentIds]
-                industryReturn = np.average(returns)
-                result.append(result[-1] * (1. + industryReturn))
-    globals()["previousEpoch"] = currentEpoch
-    return result
-
-def calculateIndustryIndices(industry):
-    return calculateIndustryIndicesUpToEpoch(industry, getCurrentEpoch())
-
-def getInstrumentId(instrumentName):
-    response = requests.get("http://egchallenge.tech/instruments")
-    parsed = json.loads(response.content)
-    instrument = [x for x in parsed if x["company_name"] == instrumentName]
-    return instrument[0]["id"]
+def industryIndex(industry, endEpoch):
+    pass
 
 def simpleRollingCorrelation(instruments, historical=0, window=10):
     marketDatas = []
