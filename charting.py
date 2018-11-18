@@ -23,6 +23,7 @@ FrameLeft.grid(row=0, column=0, rowspan=6, columnspan=4, sticky=W+N+S)
 a = f.add_subplot(111)
 
 plotgraph = []
+timeframe = 500
 
 a.set_xlabel("epoch")
 a.set_ylabel("price")
@@ -42,7 +43,7 @@ for i in range(1, 10):
 names.sort()
 variable.set(names[0])
 
-s = Scale(bigFrame, tickinterval=25, orient=HORIZONTAL)
+s = Scale(bigFrame, from_=10, to=1000, resolution=10, orient=HORIZONTAL)
 s.grid(row=5, column=0, sticky=N+W)
 
 
@@ -59,12 +60,15 @@ def add_button():
     if(isnt_repeat):
         listbox.insert(END, variable.get())
         instrumentID = backend.getInstrumentId(variable.get())
-        timeframe = 500
+        global timeframe
+        timeframe = s.get()
         instrementData = backend.getMarketData(instrumentID, timeframe)
         global plotgraph
         plotgraph.append(a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"]))
         a.set_title(instrementData["name"])
         dataPlot.draw()
+        color = plotgraph[listbox.size() - 1][0].get_color()
+        listbox.itemconfig(listbox.size() - 1, {'bg': color})
 
 
 def remove_button():
