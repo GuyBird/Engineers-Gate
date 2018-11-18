@@ -16,9 +16,9 @@ master.title("Engineers Gate Hire Us")
 tabs = ttk.Notebook(master, style="BW.TLabel")
 master.configure(background='white')
 
-tab1 = ttk.Frame(tabs)
-tab2 = ttk.Frame(tabs)
-tab3 = ttk.Frame(tabs)
+tab1 = ttk.Frame(tabs, style="BW.TLabel")
+tab2 = ttk.Frame(tabs, style="BW.TLabel")
+tab3 = ttk.Frame(tabs, style="BW.TLabel")
 
 
 f = Figure(figsize=(5, 4), dpi=100)
@@ -54,17 +54,41 @@ a.set_ylabel("price")
 dataPlot = FigureCanvasTkAgg(f, master=master)
 dataPlot.draw()
 
-e = Entry(master)
+scrollbar = Scrollbar(bigFrame)
+scrollbar.grid(row=0, column=3, rowspan=1, columnspan=1, sticky=N)
+
+names = Listbox(bigFrame, height=3, width=40)
+names.grid(row=0, column=0, rowspan=1, columnspan=4, sticky=N)
+
+scrollbar1 = Scrollbar(bigFrame2)
+scrollbar1.grid(row=1, column=1, rowspan=1, columnspan=1, sticky=N)
+
+names1 = Listbox(bigFrame2, height=3, width=50)
+names1.grid(row=1, column=0, rowspan=1, columnspan=2, sticky=N+W)
+
+namesL = []
+for i in range(1, 500):
+    namesL.append(backend.getInstrumentById(i)["company_name"])
+
+namesL.sort()
+
+for i in range(0, 499):
+    names.insert(END, namesL[i])
+    names1.insert(END, namesL[i])
+
+# attach listbox to scrollbar
+names.config(yscrollcommand=scrollbar.set)
+scrollbar.config(command=names.yview)
+
+names1.config(yscrollcommand=scrollbar1.set)
+scrollbar1.config(command=names1.yview)
 
 variable = StringVar(master)
 
+title = []
 
-names = []
-for i in range(1, 10):
-    names.append(backend.getInstrumentById(i)["company_name"])
 
-names.sort()
-variable.set(names[0])
+# variable.set(names[0])
 
 s = Scale(bigFrame, from_=10, to=1000, resolution=10, activebackground="#40913F", highlightcolor='#40913F', orient=HORIZONTAL, bg='white', bd=0, highlightbackground='white')
 s.set(500)
@@ -82,13 +106,20 @@ def add_button():
         if i == variable.get():
             is_unique = False
     if is_unique:
-        listbox.insert(END, variable.get())
-        instrumentID = backend.getInstrumentId(variable.get())
+        listbox.insert(END, names.get(names.curselection()))
+        instrumentID = backend.getInstrumentId(names.get(names.curselection()))
+        instrument = backend.getInstrumentById(instrumentID)
+        symbol = instrument["symbol"]
+
         global time_frame
         time_frame = s.get()
         instrument_data = backend.getMarketData(instrumentID, time_frame)
         global plot_graph
         plot_graph.append(a.plot(list(range((instrument_data["currentEpoch"]) + 1 - len(instrument_data["price"]), instrument_data["currentEpoch"] + 1)), instrument_data["price"]))
+
+        title.append(names.get(names.curselection()) + '[' + symbol + ']')
+        a.set_title(', '.join(title))
+
         dataPlot.draw()
         color = plot_graph[listbox.size() - 1][0].get_color()
         listbox.itemconfig(listbox.size() - 1, {'bg': color})
@@ -112,7 +143,12 @@ def remove_button():
                 a.set_ylim(minvalue - (minvalue * 0.05), maxvalue + (maxvalue * 0.05))
             else:
                 a.set_ylim(minvalue, maxvalue)
+
+        del title[index]
+        a.set_title(', '.join(title))
+
         dataPlot.draw()
+
 
 
 def move_array(index):
@@ -155,10 +191,38 @@ def select_button():
     count = 0
     for index in range(0, len(plot_graph) - 1):
         del plot_graph[index]
+        del title[index - 1]
         count += 1
     listbox.delete(0, END)
     dataPlot.draw()
-    add_button()
+    add_selection_button()
+
+
+def add_selection_button():
+    is_unique = True
+    elements = listbox.get(0, listbox.size())
+    for i in elements:
+        if i == variable.get():
+            is_unique = False
+    if is_unique:
+        listbox.insert(END, names1.get(names1.curselection()))
+        instrumentID = backend.getInstrumentId(names1.get(names1.curselection()))
+        instrument = backend.getInstrumentById(instrumentID)
+        symbol = instrument["symbol"]
+
+        global time_frame
+        time_frame = s.get()
+        instrument_data = backend.getMarketData(instrumentID, time_frame)
+        global plot_graph
+        plot_graph.append(a.plot(list(range((instrument_data["currentEpoch"]) + 1 - len(instrument_data["price"]), instrument_data["currentEpoch"] + 1)), instrument_data["price"]))
+
+        title.append(names1.get(names1.curselection()) + '[' + symbol + ']')
+        a.set_title(', '.join(title))
+
+        dataPlot.draw()
+        color = plot_graph[listbox.size() - 1][0].get_color()
+        listbox.itemconfig(listbox.size() - 1, {'bg': color})
+    change_time_frame()
 
 
 def moving_avg_button():
@@ -202,17 +266,17 @@ b1 = Button(bigFrame, text='Remove', bg='#00a86b', foreground="#ffffff", command
 b1.grid(row=3, column=1, sticky=N)
 b2 = Button(bigFrame, text='Apply', bg='#00a86b', foreground="#ffffff", command=lambda: change_time_frame())
 b2.grid(row=5, column=1, sticky=S)
-w = OptionMenu(bigFrame, variable, *names)
-w.config(width=40)
-w.grid(row=2, column=0, sticky=N, columnspan=2)
+# w = OptionMenu(bigFrame, variable, *names)
+# w.config(width=40)
+# w.grid(row=2, column=0, sticky=N, columnspan=2)
 dataPlot.get_tk_widget().grid(row=0, column=4, sticky=S+E+N)
 
-w2 = OptionMenu(bigFrame2, variable, *names)
-w2.config(width=30)
-w2.grid(row=2, column=0, sticky=N)
+# w2 = OptionMenu(bigFrame2, variable, *names)
+# w2.config(width=30)
+# w2.grid(row=2, column=0, sticky=N)
 
 b21 = Button(bigFrame2, text='Select', bg='#00a86b', foreground="#ffffff", command=lambda: select_button())
-b21.grid(row=2, column=1, sticky=N)
+b21.grid(row=1, column=2, sticky=N)
 
 b211 = ttk.Checkbutton(bigFrame2, text='Simlpe Moving Avg.', command=lambda: moving_avg_button())
 b211.grid(row=3, column=0, sticky=E)
