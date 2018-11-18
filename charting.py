@@ -184,14 +184,46 @@ def expo_moving_avg_button():
 
 
 def moving_standard_deviation_button():
-    return 1
+    if 'selected' in b221.state():
+        index = backend.getInstrumentId(variable.get())
+        market_data = backend.getMarketData(index, time_frame)
+        expo_moving_avg = backend.movingStdDev(market_data, 1)
+        print(expo_moving_avg)
+        plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
+        a.set_ylim(0, 30)
+    else:
+        plot_graph[3].pop(0).remove()
+    dataPlot.draw()
 
 
 def expo_standard_deviation_button():
-    return 1
+    if 'selected' in b222.state():
+        index = backend.getInstrumentId(variable.get())
+        market_data = backend.getMarketData(index, time_frame)
+        expo_moving_avg = backend.expMovingStdDev(market_data, 1)
+        plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
+        a.set_ylim(0, 10)
+    else:
+        plot_graph[4].pop(0).remove()
+    dataPlot.draw()
+
 
 
 def autocorrelation_button():
+    if 'selected' in b231.state():
+        index = backend.getInstrumentId(variable.get())
+        market_data = backend.getMarketData(index, time_frame)
+        expo_moving_avg = backend.rangeAutocorrelation(market_data, 10)
+        print(expo_moving_avg)
+        a.set_ylim(-1, 1)
+        a.set_xlim(4321, 4334)
+        plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
+    else:
+        plot_graph[5].pop(0).remove()
+    dataPlot.draw()
+
+
+def chart_industry_indexes():
     return 1
 
 
@@ -228,6 +260,9 @@ b222.grid(row=4, column=1, sticky=E)
 
 b231 = ttk.Checkbutton(bigFrame2, text='Autocorrelation', command=lambda: autocorrelation_button())
 b231.grid(row=5, column=0, sticky=E)
+
+b232 = ttk.Checkbutton(bigFrame2, text='chart industry indexes', command=lambda: chart_industry_indexes())
+b232.grid(row=5, column=1, sticky=E)
 
 master.mainloop()
 
