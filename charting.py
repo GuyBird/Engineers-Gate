@@ -156,7 +156,6 @@ def select_button():
 
 
 def moving_avg_button():
-    print(b211.state())
     if 'selected' in b211.state():
         index = backend.getInstrumentId(variable.get())
         market_data = backend.getMarketData(index, time_frame)
