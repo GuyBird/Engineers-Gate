@@ -224,7 +224,36 @@ def autocorrelation_button():
 
 
 def chart_industry_indexes():
-    return 1
+    if 'selected' in b232.state():
+        datapoints = backend.industryIndex()
+        plot_graph.append(a.plot(range(0, len(datapoints))), datapoints)
+
+    else:
+        plot_graph[6].pop(0).remove()
+    dataPlot.draw()
+
+
+def rolling_correlation_pair_button():
+    if 'selected' in b241.state():
+        index = backend.getInstrumentId(variable.get())
+        market_data = backend.getMarketData(index, time_frame)
+        expo_moving_avg = backend.rollingCorrelation(["Blank River", "Dew Iceberg"], time_frame)
+        plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
+    else:
+        plot_graph[7].pop(0).remove()
+    dataPlot.draw()
+
+
+def expo_correlation_pair_button():
+    if 'selected' in b242.state():
+        index = backend.getInstrumentId(variable.get())
+        market_data = backend.getMarketData(index, time_frame)
+        expo_moving_avg = backend.expRollingCorrelation(["Blank River", "Dew Iceberg"], time_frame)
+        plot_graph.append(a.plot(list(range((market_data["currentEpoch"]) + 1 - len(expo_moving_avg), market_data["currentEpoch"] + 1)), expo_moving_avg))
+    else:
+        plot_graph[8].pop(0).remove()
+    dataPlot.draw()
+
 
 
 b = Button(bigFrame, text='Add', bg='#00a86b', foreground="#ffffff", command=lambda: add_button())
@@ -263,6 +292,12 @@ b231.grid(row=5, column=0, sticky=E)
 
 b232 = ttk.Checkbutton(bigFrame2, text='chart industry indexes', command=lambda: chart_industry_indexes())
 b232.grid(row=5, column=1, sticky=E)
+
+b241 = ttk.Checkbutton(bigFrame2, text='rolling correlation between the return of a pair', command=lambda: rolling_correlation_pair_button())
+b241.grid(row=6, column=0, sticky=E)
+
+b242 = ttk.Checkbutton(bigFrame2, text='Exponentially weighted correlation between the return of a pair', command=lambda: expo_correlation_pair_button())
+b242.grid(row=6, column=1, sticky=E)
 
 master.mainloop()
 
