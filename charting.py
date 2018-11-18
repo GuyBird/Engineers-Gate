@@ -94,7 +94,6 @@ def change_timeframe():
     elements = listbox.get(0, listbox.size())
     count = 0
     for i in elements:
-        print(count)
         plotgraph[count][0].remove()
         instrumentID = backend.getInstrumentId(i)
         timeframe = s.get()
