@@ -44,7 +44,7 @@ names.sort()
 variable.set(names[0])
 
 s = Scale(bigFrame, from_=10, to=1000, resolution=10, orient=HORIZONTAL)
-s.grid(row=5, column=0, sticky=N+W)
+s.grid(row=5, column=0, sticky=N)
 
 
 listbox = Listbox(bigFrame)
@@ -69,6 +69,7 @@ def add_button():
         dataPlot.draw()
         color = plotgraph[listbox.size() - 1][0].get_color()
         listbox.itemconfig(listbox.size() - 1, {'bg': color})
+    change_timeframe()
 
 
 def remove_button():
@@ -87,10 +88,28 @@ def move_array(index):
     del plotgraph[len(plotgraph) - 1]
 
 
+def change_timeframe():
+    global timeframe
+    global plotgraph
+    elements = listbox.get(0, listbox.size())
+    count = 0
+    for i in elements:
+        print(count)
+        plotgraph[count][0].remove()
+        instrumentID = backend.getInstrumentId(i)
+        timeframe = s.get()
+        instrementData = backend.getMarketData(instrumentID, timeframe)
+        color = plotgraph[count][0].get_color()
+        plotgraph[count] = (a.plot(list(range((instrementData["currentEpoch"]) + 1 - len(instrementData["price"]), instrementData["currentEpoch"] + 1)), instrementData["price"], color=color))
+        count += 1
+    dataPlot.draw()
+
 b = Button(bigFrame, text='Add', bg='#488cf9', foreground="#ffffff", command=lambda: add_button())
 b.grid(row=3, column=0, sticky=N)
 b1 = Button(bigFrame, text='Remove', bg='#488cf9', foreground="#ffffff", command=lambda: remove_button())
 b1.grid(row=3, column=1, sticky=N)
+b2 = Button(bigFrame, text='Apply', bg='#488cf9', foreground="#ffffff", command=lambda: change_timeframe())
+b2.grid(row=5, column=1, sticky=S)
 w = OptionMenu(bigFrame, variable, *names)
 
 w.grid(row=2, column=0, sticky=N)
