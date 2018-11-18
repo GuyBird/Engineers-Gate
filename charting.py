@@ -3,22 +3,39 @@ import backend
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from tkinter import *
+from tkinter import ttk
 
 matplotlib.use('TkAgg')
 master = Tk()
 master.title("Engineers Gate Hire Us")
+tabs = ttk.Notebook(master)
+
+tab1 = ttk.Frame(tabs)
+tab2 = ttk.Frame(tabs)
+tab3 = ttk.Frame(tabs)
+
 
 f = Figure(figsize=(5, 4), dpi=100)
-bigFrame = Frame()
+bigFrame = Frame(tab1)
 bigFrame.grid()
+bigFrame2 = Frame(tab2)
+bigFrame2.grid()
+
+tabs.add(tab1, text="Prices", compound=TOP)
+tabs.add(tab2, text="Indicators")
+tabs.add(tab3, text="To be implemented")
+tabs.grid()
 
 for r in range(6):
-    master.rowconfigure(r, weight=1)
+    master.rowconfigure(r, weight=1,)
 for c in range(4):
     master.columnconfigure(c, weight=1)
 
 FrameLeft = Frame(bigFrame)
 FrameLeft.grid(row=0, column=0, rowspan=6, columnspan=4, sticky=W+N+S)
+
+FrameLeft2 = Frame(bigFrame2)
+FrameLeft2.grid(row=0, column=0, rowspan=6, columnspan=4, sticky=W+N+S)
 
 a = f.add_subplot(111)
 
@@ -128,6 +145,16 @@ def change_time_frame():
     dataPlot.draw()
 
 
+def select_button():
+    count = 0
+    for index in range(0, len(plot_graph) - 1):
+        del plot_graph[index]
+        count += 1
+    listbox.delete(0, END)
+    dataPlot.draw()
+    add_button()
+
+
 b = Button(bigFrame, text='Add', bg='#488cf9', foreground="#ffffff", command=lambda: add_button())
 b.grid(row=3, column=0, sticky=N)
 b1 = Button(bigFrame, text='Remove', bg='#488cf9', foreground="#ffffff", command=lambda: remove_button())
@@ -135,9 +162,15 @@ b1.grid(row=3, column=1, sticky=N)
 b2 = Button(bigFrame, text='Apply', bg='#488cf9', foreground="#ffffff", command=lambda: change_time_frame())
 b2.grid(row=5, column=1, sticky=S)
 w = OptionMenu(bigFrame, variable, *names)
-
 w.grid(row=2, column=0, sticky=N)
 dataPlot.get_tk_widget().grid(row=0, column=4, sticky=S+E+N)
+
+w2 = OptionMenu(bigFrame2, variable, *names)
+w2.grid(row=2, column=0, sticky=N)
+
+b21 = Button(bigFrame2, text='Select', bg='#488cf9', foreground="#ffffff", command=lambda: select_button())
+b21.grid(row=2, column=1, sticky=N)
+
 
 master.mainloop()
 
